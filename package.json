@@ -1,0 +1,25 @@
+{
+  "name": "log-system-frontend",
+  "version": "0.1.0",
+  "description": "log system -frontend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tinyleaf-e/LogSystem-frontend.git"
+  },
+  "keywords": [
+    "vue",
+    "log",
+    "html",
+    "element-ui"
+  ],
+  "author": "tinyleaf-e",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tinyleaf-e/LogSystem-frontend/issues"
+  },
+  "homepage": "https://github.com/tinyleaf-e/LogSystem-frontend#readme"
+}
