@@ -5,6 +5,8 @@ import Formats from '../components/Format.vue'
 import FormatItems from '../components/FormatItem.vue'
 import LogView from '../components/LogView.vue'
 import User from '../components/User.vue'
+import Login from '../components/Login.vue'
+import Error from '../components/Error.vue'
 
 Vue.use(Router)
 
@@ -29,6 +31,14 @@ export  default  new Router({
         {
             path:'/users',
             component:User
+        },
+        {
+            path:'/login',
+            component:Login
+        },
+        {
+            path:'/error',
+            component:Error
         }
     ]
 })

@@ -3,10 +3,7 @@
         <el-row>
             <el-col :span="24" style="padding-bottom: 10px;border-bottom: 1px solid #eee;margin-bottom: 20px">
                 <el-breadcrumb separator-class="el-icon-arrow-right">
-                    <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                    <el-breadcrumb-item>活动管理</el-breadcrumb-item>
-                    <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-                    <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+                    <el-breadcrumb-item :to="{ path: '/pojects' }">首页</el-breadcrumb-item>
                 </el-breadcrumb>
             </el-col>
         </el-row>
@@ -17,20 +14,20 @@
             <el-col :span="12" v-for="i in projects" :key="i.name" class="project-block">
                 <el-card class="box-card">
                     <div slot="header" class="clearfix">
-                        <span>{{i.name}}</span>
-                        <el-button style="float: right; padding: 3px 0" type="text">操作按钮</el-button>
+                        <span>{{i.Name}}</span>
+                        <el-button style="float: right; padding: 3px 0" type="text">详情</el-button>
                     </div>
                     <div class="text item project-item">
-                        <label>createTime:</label>
-                        <span>{{i.createTime}}</span>
+                        <label>创建时间:</label>
+                        <span>{{i.CreateTime}}</span>
                     </div>
                     <div class="text item project-item">
-                        <label>desc:</label>
-                        <span>{{i.desc}}</span>
+                        <label>描述:</label>
+                        <span>{{i.Desc}}</span>
                     </div>
                     <div class="text item project-item">
-                        <label>todayAdded:</label>
-                        <span>{{i.name}}</span>
+                        <label>今日新增:</label>
+                        <span>{{i.Name}}</span>
                     </div>
                 </el-card>
             </el-col>
@@ -39,28 +36,40 @@
 </template>
 
 <script>
+    import axios from "axios";
+    import cookies from "js-cookie"
     export default {
         name: "Projects",
         data:function () {
-
-        return {
-                projects:[
-                    {
-                        name:"Project 1",
-                        createTime:"2019-09-09 12:11",
-                        desc:"test test test"
+            return {
+                userId:cookies.get("id"),
+                projects:[]
+            }
+        },
+        mounted(){
+            this.getProjects()
+        },
+        methods:{
+            getProjects:function () {
+                axios.get(config.serverUrl+"/project", {
+                    params: {
+                        userId: this.userId
                     },
-                    {
-                        name:"Project 2",
-                        createTime:"2019-09-09 12:11",
-                        desc:"test test test"
+                    validateStatus: function () {
+                        return true
                     },
-                    {
-                        name:"Project 3",
-                        createTime:"2019-09-09 12:11",
-                        desc:"test test test"
-                    },
-                ]
+                    headers: {'Authorization': cookies.get("token")},
+                })
+                    .then(response=>{
+                        if(response.status==200){
+                            this.projects=response.data.rel
+                        }
+                        else
+                            this.$message({
+                                message: response.data.msg,
+                                type: 'error'
+                            });
+                    })
             }
         }
     }
@@ -70,5 +79,11 @@
 
     .project-block{
         padding-bottom: 20px;
+    }
+    .item label{
+        font-weight: bold;
+        width: 70px;
+        display: inline-block;
+        text-align: right;
     }
 </style>
