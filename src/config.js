@@ -1,4 +1,42 @@
 global.config={
     serverUrl1:"http://10.251.254.198:8011",
-    serverUrl:"http://localhost:8011"
+    serverUrl:"http://localhost:8011",
+    queryConfig:{
+        type:{
+            shortString:{
+                "=":"any",
+                "<>":"any",
+                "like":"any",
+                "in":"array"
+            },
+            int:{
+                "<":"any",
+                ">":"any",
+                "<=":"any",
+                "<=":"any",
+                "=":"any",
+                "<>":"any",
+                "in":"int_array"
+            },
+            bool:{
+                "<>":"bool",
+                "=":"bool"
+            },
+            time:{
+                "range":"time_range"
+            }
+        },
+        patten:{
+            "any":".+",
+            "array":".+?(,.+?)*",
+            "int_array":"-?[0-9]+?(,-?[0-9]+?)*",
+            "bool":"true|false",
+            "time_array":"[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2},[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}"
+        }
+    },
+    defaultShowAttr:["ip_address","create_time"],
+    staticKeySet:{
+        create_time:"time",
+        ip_address:"shortString"
+    }
 }

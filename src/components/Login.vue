@@ -1,7 +1,7 @@
 <template>
-    <el-card class="box-card" shadow="always" style="width: 400px;margin-left: calc(50% - 200px);text-align: center">
+    <el-card class="box-card" shadow="always" style="width: 400px;margin-left: calc(50% - 200px);text-align: center;margin-top: 100px">
         <div slot="header" class="clearfix">
-            <span>卡片名称</span>
+            <span>登 录</span>
         </div>
         <div class="text item">
             <el-input v-model="userId" placeholder="请输入用户名">
@@ -14,7 +14,7 @@
             </el-input>
         </div>
         <div class="text item">
-            <el-button type="primary" @click="login" style="width: 100%">登录</el-button>
+            <el-button type="primary" @click="login" style="width: 100%;margin-top: 10px">登录</el-button>
         </div>
     </el-card>
 </template>

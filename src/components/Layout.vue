@@ -1,14 +1,13 @@
 <template>
     <el-container>
-        <el-header style="background: antiquewhite">
-            <el-row type="flex" class="row-bg" justify="space-between">
+        <el-header class="header" >
+            <el-row type="flex" class="row-bg" style="max-width: 1200px;width: 100%;margin: 0 auto;overflow: hidden" justify="space-between">
                 <el-col :span="6">
-                    <img width="100px" height="50px" />
-                    <span style="line-height: 50px;display: inline-block">LogSystem</span>
+                    <img height="50px" src="../assets/logsystem-logo-svg.svg" />
                 </el-col>
-                <el-col :span="6" style="text-align: right;line-height: 60px">
+                <el-col :span="6" style="text-align: right;line-height: 50px">
                     <el-dropdown>
-                        <span class="el-dropdown-link">
+                        <span class="el-dropdown-link" style="font-size: 16px">
                             14211054<i class="el-icon-arrow-down el-icon--right"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
@@ -19,7 +18,7 @@
                 </el-col>
             </el-row>
         </el-header>
-        <el-main style="background: beige">
+        <el-main  style="max-width: 1200px;width: 100%;margin: 0 auto;overflow: hidden;padding: 0">
             <keep-alive>
                 <router-view></router-view>
             </keep-alive>
@@ -36,4 +35,10 @@
 </script>
 
 <style scoped>
+    .header{
+        background: white;
+        padding: 15px 28px 12px 28px;
+        box-shadow: 0px 5px 12px 0px rgba(0,0,0,0.1);
+        height: auto!important;
+    }
 </style>

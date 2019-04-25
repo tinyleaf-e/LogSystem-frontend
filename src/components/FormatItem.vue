@@ -1,8 +1,8 @@
 <template>
-    <el-container>
-        <el-header>
+    <el-container style="padding: 0">
+        <el-header style="height: auto;">
             <el-row>
-                <el-col :span="24" style="padding-bottom: 10px;border-bottom: 1px solid #eee;margin-bottom: 20px">
+                <el-col :span="24" style="padding: 20px 0;background: rgba(255,255,255,0)">
                     <el-breadcrumb separator-class="el-icon-arrow-right">
                         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
                         <el-breadcrumb-item>活动管理</el-breadcrumb-item>
@@ -12,85 +12,83 @@
                 </el-col>
             </el-row>
         </el-header>
-        <el-main>
+        <el-main style="background: white;padding-top: 0">
             <el-row>
                 <h3>项目列表</h3>
             </el-row>
             <el-row>
-                <el-button type="primary" icon="el-icon-plus" @click="dialogFormVisible=true">搜索</el-button>
+                <el-button type="primary" icon="el-icon-plus" @click="dialogFormVisible=true" style="margin-bottom: 20px">新增</el-button>
             </el-row>
             <el-row>
                 <el-table border
-                        :data="tableData"
+                        :data="formatItems"
                         style="width: 100%">
                     <el-table-column type="expand">
                         <template slot-scope="props">
                             <el-form label-position="left" inline class="demo-table-expand">
-                                <el-form-item label="商品名称">
-                                    <span>{{ props.row.name }}</span>
+                                <el-form-item label="描述">
+                                    <span>{{ props.row.Desc }}</span>
                                 </el-form-item>
-                                <el-form-item label="所属店铺">
-                                    <span>{{ props.row.shop }}</span>
-                                </el-form-item>
-                                <el-form-item label="商品 ID">
-                                    <span>{{ props.row.id }}</span>
-                                </el-form-item>
-                                <el-form-item label="店铺 ID">
-                                    <span>{{ props.row.shopId }}</span>
-                                </el-form-item>
-                                <el-form-item label="商品分类">
-                                    <span>{{ props.row.category }}</span>
-                                </el-form-item>
-                                <el-form-item label="店铺地址">
-                                    <span>{{ props.row.address }}</span>
-                                </el-form-item>
-                                <el-form-item label="商品描述">
-                                    <span>{{ props.row.desc }}</span>
+                                <el-form-item label="示例">
+                                    <span>{{ props.row.Example }}</span>
                                 </el-form-item>
                             </el-form>
                         </template>
                     </el-table-column>
                     <el-table-column
-                            label="商品 ID"
-                            prop="id">
+                            label="字段ID"
+                            prop="Name">
                     </el-table-column>
                     <el-table-column
-                            label="商品名称"
-                            prop="name">
+                            label="类型">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.Type.substring(0,scope.row.Type.length-1) }}</span>
+                        </template>
                     </el-table-column>
                     <el-table-column
-                            label="描述"
-                            prop="desc">
+                            label="可否编辑">
+                        <template slot-scope="scope">
+                            <span>{{ scope.row.Editable?"是":"否" }}</span>
+                        </template>
                     </el-table-column>
                     <el-table-column
                             fixed="right"
                             label="操作"
                             width="100">
                         <template slot-scope="scope">
-                            <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
-                            <el-button type="text" size="small">编辑</el-button>
+                            <el-button @click="handleClick(scope.row)" type="text" size="small">编辑</el-button>
+                            <el-button type="text" size="small" @click="deleteFormatItem(scope.row.Id)">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
             </el-row>
-            <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
+            <el-dialog title="新增字段" :visible.sync="dialogFormVisible">
                 <el-form :model="form">
-                    <el-form-item label="活动名称" :label-width="formLabelWidth">
-                        <el-input v-model="form.name" autocomplete="off"></el-input>
+                    <el-form-item label="字段ID" :label-width="formLabelWidth">
+                        <el-input v-model="form.id" autocomplete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="活动区域" :label-width="formLabelWidth">
-                        <el-select v-model="form.region" placeholder="请选择活动区域">
-                            <el-option label="区域一" value="shanghai"></el-option>
-                            <el-option label="区域二" value="beijing"></el-option>
+                    <el-form-item label="类型" :label-width="formLabelWidth">
+                        <el-select v-model="form.type" placeholder="请选择字段类型">
+                            <el-option label="shortString" value="shortString"></el-option>
+                            <el-option label="int" value="int"></el-option>
+                            <el-option label="bool" value="bool"></el-option>
+                            <el-option label="longString" value="longString"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="活动形式" prop="desc">
-                        <el-input type="textarea" v-model="form.name"></el-input>
+                    <el-form-item label="描述" prop="desc" :label-width="formLabelWidth">
+                        <el-input type="textarea" v-model="form.desc"></el-input>
+                    </el-form-item>
+                    <el-form-item label="示例" prop="desc" :label-width="formLabelWidth">
+                        <el-input type="textarea" v-model="form.example"></el-input>
+                    </el-form-item>
+                    <el-form-item label="可编辑" :label-width="formLabelWidth">
+                        <el-switch  v-model="form.editable" active-color="#13ce66">
+                        </el-switch>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="dialogFormVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+                    <el-button @click="dialogCancel()">取 消</el-button>
+                    <el-button type="primary" @click="dialogConfirm()">确 定</el-button>
                 </div>
             </el-dialog>
         </el-main>
@@ -98,55 +96,169 @@
 </template>
 
 <script>
+    import axios from "axios";
+    import cookies from "js-cookie"
     export default {
         name: "FormatItem",
         data:function () {
             return {
-                tableData: [{
-                    id: '12987122',
-                    name: '好滋好味鸡蛋仔',
-                    category: '江浙小吃、小吃零食',
-                    desc: '荷兰优质淡奶，奶香浓而不腻',
-                    address: '上海市普陀区真北路',
-                    shop: '王小虎夫妻店',
-                    shopId: '10333'
-                }, {
-                    id: '12987123',
-                    name: '好滋好味鸡蛋仔',
-                    category: '江浙小吃、小吃零食',
-                    desc: '荷兰优质淡奶，奶香浓而不腻',
-                    address: '上海市普陀区真北路',
-                    shop: '王小虎夫妻店',
-                    shopId: '10333'
-                }, {
-                    id: '12987125',
-                    name: '好滋好味鸡蛋仔',
-                    category: '江浙小吃、小吃零食',
-                    desc: '荷兰优质淡奶，奶香浓而不腻',
-                    address: '上海市普陀区真北路',
-                    shop: '王小虎夫妻店',
-                    shopId: '10333'
-                }, {
-                    id: '12987126',
-                    name: '好滋好味鸡蛋仔',
-                    category: '江浙小吃、小吃零食',
-                    desc: '荷兰优质淡奶，奶香浓而不腻',
-                    address: '上海市普陀区真北路',
-                    shop: '王小虎夫妻店',
-                    shopId: '10333'
-                }],
+                userId:cookies.get("id"),
+                formatId:this.$route.query.formatId,
+                formatItems:[],
                 dialogFormVisible: false,
                 form: {
-                    name: '',
-                    region: '',
-                    date1: '',
-                    date2: '',
-                    delivery: false,
-                    type: [],
-                    resource: '',
+                    id: '',
+                    editable: false,
+                    type: '',
+                    example: '',
                     desc: ''
                 },
-                formLabelWidth: '120px'
+                formLabelWidth: '80px'
+            }
+        },
+        mounted(){
+            this.getFormatItems()
+        },
+        methods:{
+            getFormatItems:function () {
+                axios.get(config.serverUrl+"/format-item", {
+                    params: {
+                        formatId: this.formatId
+                    },
+                    validateStatus: function () {
+                        return true
+                    },
+                    headers: {'Authorization': cookies.get("token")},
+                })
+                    .then(response=>{
+                        if(response.status==200){
+                            this.formatItems=response.data.rel
+                        }
+                        else
+                            this.$message({
+                                message: response.data.msg,
+                                type: 'error'
+                            });
+                    })
+            },
+            dialogCancel:function(){
+                this.dialogFormVisible=false;
+                this.form={
+                    id: '',
+                    editable: false,
+                    type: '',
+                    example: '',
+                    desc: ''
+                }
+            },
+            dialogConfirm:function () {
+                var typeCountMax={
+                    "longString":5,
+                    "shortString":10,
+                    "int":5,
+                    "bool":3
+                };
+                var editableMax=2;
+
+                if(this.form.id.trim()==""||this.form.type==""){
+                    this.$message({
+                        message: "必填字段不能为空",
+                        type: 'error'
+                    });
+                }else if(this.typeCount(this.form.type)>=typeCountMax[this.form.type]){
+                    this.$message({
+                        message: this.form.type+" 类型数量不能超过"+typeCountMax[this.form.type]+"个",
+                        type: 'error'
+                    });
+                }else if(this.editable&&this.editableCount()>=editableMax){
+                    this.$message({
+                        message: "可编辑的字段不能超过"+editableMax+"个",
+                        type: 'error'
+                    });
+                }else if(this.idExist(this.form.id)){
+                    this.$message({
+                        message: "该字段ID已存在",
+                        type: 'error'
+                    });
+                }else {
+                    var postData={
+                        formatId:this.formatId,
+                        name:this.form.id,
+                        desc:this.form.desc,
+                        example:this.form.example,
+                        editable:this.form.editable,
+                        type:this.form.type
+                    };
+                    this.$ajax.post(config.serverUrl+"/format-item",this.$qs.stringify(postData),{
+                        validateStatus: function () {
+                            return true
+                        },
+                        headers: {'Authorization': cookies.get("token")},
+                    })
+                        .then(response=>{
+                            if(response.status==200){
+                                this.getFormatItems();
+                                this.$message({
+                                    message: response.data.rel,
+                                    type: 'success'
+                                });
+                                this.dialogFormVisible=false
+                            }
+                            else
+                                this.$message({
+                                    message: response.data.msg,
+                                    type: 'error'
+                                });
+                        })
+                }
+                this.dialogFormVisible=true;
+            },
+            typeCount:function (type) {
+                var count = 0;
+                for(var i in this.formatItems){
+                    if(i.Type==type)
+                        count++
+                }
+                return count
+            },
+            idExist:function (id) {
+                for(var i in this.formatItems){
+                    if(i.Id==id)
+                        return true
+                }
+                return false
+            },
+            deleteFormatItem:function (id) {
+                this.$ajax.delete(config.serverUrl+"/format-item/"+id,{
+                    validateStatus: function () {
+                        return true
+                    },
+                    headers: {'Authorization': cookies.get("token")},
+                })
+                    .then(response=>{
+                        if(response.status==200){
+                            this.getFormatItems();
+                            this.$message({
+                                message: response.data.rel,
+                                type: 'success'
+                            });
+                        }
+                        else
+                            this.$message({
+                                message: response.data.msg,
+                                type: 'error'
+                            });
+                    })
+            }
+        },
+        computed:{
+            editableCount:function () {
+                var count = 0;
+                for(var i in this.formatItems){
+                    if(i.editable==true)
+                        count++
+                }
+                return count
             }
         }
     }
