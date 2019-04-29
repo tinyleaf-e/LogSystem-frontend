@@ -4,69 +4,73 @@
             <el-row>
                 <el-col :span="24" style="padding: 20px 0;background: rgba(255,255,255,0)">
                     <el-breadcrumb separator-class="el-icon-arrow-right">
-                        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                        <el-breadcrumb-item>活动管理</el-breadcrumb-item>
-                        <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-                        <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+                        <el-breadcrumb-item :to="{ path: '/projects' }">首页</el-breadcrumb-item>
+                        <el-breadcrumb-item :to="{path: this.nav.projectUrl}">{{this.nav.projectName}}</el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
             </el-row>
         </el-header>
         <el-main style="background: white;padding-top: 0">
             <el-row>
-                <h3>项目列表</h3>
+                <h3>格式列表</h3>
             </el-row>
             <el-row>
-                <el-button type="primary" icon="el-icon-plus" @click="dialogFormVisible=true" style="margin-bottom: 20px">新增</el-button>
+                <el-button type="primary" icon="el-icon-plus" @click="addDialogFormVisible=true" style="margin-bottom: 20px">新增</el-button>
             </el-row>
             <el-row :gutter="20">
-                <el-col :span="8" v-for="i in formats" :key="i.name" class="block">
+                <span v-if="dataTip!=''" style="font-size: 16px;margin-left: 10px">{{dataTip}}</span>
+                <el-col :md="8" :sm="12" v-for="(i,idx) in formats" :key="i.name" class="block">
                     <el-card class="box-card" shadow="always">
                         <div slot="header" class="clearfix">
                             <span>{{i.Name}}</span>
-                            <el-button style="float: right; padding: 3px 0" type="text" @click="toFormatItems(i.Id)">详情</el-button>
-                            <el-button style="float: right; padding: 3px 0" type="text" @click="toLogs(i.Id)">日志</el-button>
-                            <el-button style="float: right; padding: 3px 0" type="text" @click="deleteFormat(i.Id)">删除</el-button>
                         </div>
                         <div class="text item project-item">
-                            <label>createTime:</label>
-                            <span>{{i.CreateTime}}</span>
+                            <label>创建时间:</label>
+                            <span>{{$dateformat( i.CreateTime,'yyyy-mm-dd HH:MM:ss')}}</span>
                         </div>
                         <div class="text item project-item">
-                            <label>desc:</label>
+                            <label>描述:</label>
                             <span>{{i.Desc}}</span>
                         </div>
-                        <div class="text item project-item">
-                            <label>todayAdded:</label>
-                            <span>{{i.Name}}</span>
-                        </div>
                         <div class="text item project-item divider">
-                            <label>todayAdded:</label>
+                            <label>今日新增:</label>
                             <span>{{i.Name}}</span>
                         </div>
-                        <div class="text item project-item">
-                            <label>todayAdded:</label>
-                            <span>{{i.Name}}</span>
-                        </div>
-                        <div class="text item project-item">
-                            <label>todayAdded:</label>
-                            <span>{{i.Name}}</span>
+                        <div class="card-footer">
+                            <el-button size="small" class="footer-btn" icon="el-icon-document" type="primary" title="详情" @click="toFormatItems(i.Id)"></el-button>
+                            <el-button size="small" class="footer-btn" icon="el-icon-search" title="检索日志" @click="toLogs(i.Id)"></el-button>
+                            <el-button size="small" class="footer-btn" icon="el-icon-edit" type="warning" title="编辑" @click="editDialogShow(idx)"></el-button>
+                            <el-button size="small" class="footer-btn" icon="el-icon-delete" type="danger" title="删除" @click="deleteFormat(i.Id)"></el-button>
                         </div>
                     </el-card>
                 </el-col>
             </el-row>
-            <el-dialog title="新增项目" :visible.sync="dialogFormVisible">
-                <el-form :model="form">
-                    <el-form-item label="项目ID" :label-width="formLabelWidth">
-                        <el-input v-model="form.id" autocomplete="off"></el-input>
+            <el-dialog title="新增格式" :visible.sync="addDialogFormVisible" custom-class="dialog">
+                <el-form :model="addform">
+                    <el-form-item label="项目ID: " :label-width="formLabelWidth">
+                        <el-input v-model="addform.id" autocomplete="off"></el-input>
                     </el-form-item>
-                    <el-form-item label="描述" prop="desc" :label-width="formLabelWidth">
-                        <el-input type="textarea" v-model="form.desc"></el-input>
+                    <el-form-item label="描述: " prop="desc" style="margin-bottom: 0" :label-width="formLabelWidth">
+                        <el-input type="textarea" v-model="addform.desc"></el-input>
                     </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="dialogCancel()">取 消</el-button>
-                    <el-button type="primary" @click="dialogConfirm()">确 定</el-button>
+                    <el-button @click="addDialogCancel()">取 消</el-button>
+                    <el-button type="primary" @click="addDialogConfirm()">确 定</el-button>
+                </div>
+            </el-dialog>
+            <el-dialog title="编辑格式" :visible.sync="editDialogFormVisible">
+                <el-form :model="editform">
+                    <el-form-item label="项目ID: " :label-width="formLabelWidth">
+                        <el-input v-model="editform.id" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <el-form-item label="描述: " prop="desc" :label-width="formLabelWidth">
+                        <el-input type="textarea" v-model="editform.desc"></el-input>
+                    </el-form-item>
+                </el-form>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="editDialogCancel()">取 消</el-button>
+                    <el-button type="primary" @click="editDialogConfirm()">确 定</el-button>
                 </div>
             </el-dialog>
         </el-main>
@@ -75,40 +79,78 @@
 </template>
 
 <script>
-    import axios from "axios";
-    import cookies from "js-cookie"
     export default {
         name: "Format",
         data: function () {
             return {
-                userId: cookies.get("id"),
+                userId: this.$cookie.get("id"),
                 projectId: this.$route.query.projectId,
+                nav:{
+                    projectId:'',
+                    projectName:''
+                },
                 formats: [],
-                dialogFormVisible: false,
-                form: {
+                addDialogFormVisible: false,
+                editDialogFormVisible: false,
+                addform: {
                     id: '',
                     desc: ''
                 },
-                formLabelWidth: '80px'
+                editform: {
+                    id: '',
+                    desc: '',
+                    formatId: ''
+                },
+                formLabelWidth: '80px',
+                dataTip:"正在获取数据..."
             }
         },
         mounted() {
-            this.getFormats()
+            this.getFormats();
+            this.initNav();
         },
         methods: {
             getFormats: function () {
-                axios.get(config.serverUrl + "/format", {
+                this.$ajax.get(config.serverUrl + "/format", {
                     params: {
                         projectId: this.projectId
                     },
                     validateStatus: function () {
                         return true
                     },
-                    headers: {'Authorization': cookies.get("token")},
+                    headers: {'Authorization': this.$cookie.get("token")},
                 })
                     .then(response => {
-                        if (response.status == 200) {
-                            this.formats = response.data.rel
+                        if(response.status==200){
+                            if(response.data.rel.length>0)
+                                this.dataTip="";
+                            else
+                                this.dataTip="您还未创建格式";
+                            this.formats=response.data.rel
+                        }
+                        else{
+                            this.dataTip="数据获取错误";
+                            this.$message({
+                                message: response.data.msg,
+                                type: 'error'
+                            });
+                        }
+
+                    })
+            },
+            initNav:function(){
+                this.$ajax.get(config.serverUrl+"/project/"+this.projectId, {
+                    validateStatus: function () {
+                        return true
+                    },
+                    headers: {'Authorization': this.$cookie.get("token")},
+                })
+                    .then(response=>{
+                        if(response.status==200){
+                            this.nav={
+                                projectUrl:'/formats?projectId='+response.data.rel.Id,
+                                projectName:response.data.rel.Name
+                            }
                         }
                         else
                             this.$message({
@@ -123,21 +165,21 @@
             toLogs: function (formatId) {
                 this.$router.push({path: '/logs', query: {formatId: formatId}})
             },
-            dialogCancel: function () {
-                this.dialogFormVisible = false;
-                this.form = {
+            addDialogCancel: function () {
+                this.addDialogFormVisible = false;
+                this.addform = {
                     id: '',
                     desc: ''
                 }
             },
-            dialogConfirm: function () {
+            addDialogConfirm: function () {
 
-                if (this.form.id.trim() == "" || this.form.desc.trim() == "") {
+                if (this.addform.id.trim() == "" || this.addform.desc.trim() == "") {
                     this.$message({
                         message: "ID和描述不能为空",
                         type: 'error'
                     });
-                } else if (this.idExist(this.form.id)) {
+                } else if (this.idExist(this.addform.id)) {
                     this.$message({
                         message: "该格式ID已存在",
                         type: 'error'
@@ -145,15 +187,15 @@
                 } else {
                     var postData = {
                         userId: this.userId,
-                        name: this.form.id,
-                        desc: this.form.desc,
+                        name: this.addform.id,
+                        desc: this.addform.desc,
                         projectId:this.projectId
                     };
                     this.$ajax.post(config.serverUrl + "/format", this.$qs.stringify(postData), {
                         validateStatus: function () {
                             return true
                         },
-                        headers: {'Authorization': cookies.get("token")},
+                        headers: {'Authorization': this.$cookie.get("token")},
                     })
                         .then(response => {
                             if (response.status == 200) {
@@ -162,7 +204,7 @@
                                     message: response.data.rel,
                                     type: 'success'
                                 });
-                                this.dialogFormVisible = false
+                                this.addDialogFormVisible = false
                             }
                             else
                                 this.$message({
@@ -171,9 +213,56 @@
                                 });
                         })
                 }
-                this.dialogFormVisible = true;
             },
 
+            editDialogShow:function(idx){
+                this.editDialogFormVisible=true;
+                this.editform.projectId=this.formats[idx].Id;
+                this.editform.id=this.formats[idx].Name;
+                this.editform.desc=this.formats[idx].Desc;
+            },
+            editDialogCancel:function(){
+                this.editDialogFormVisible=false;
+                this.editform={
+                    id: '',
+                    desc: ''
+                }
+            },
+            editDialogConfirm:function () {
+
+                if(this.editform.id.trim()==""||this.editform.desc.trim()==""){
+                    this.$message({
+                        message: "ID和描述不能为空",
+                        type: 'error'
+                    });
+                }else {
+                    var postData={
+                        name:this.editform.id,
+                        desc:this.editform.desc
+                    };
+                    this.$ajax.post(config.serverUrl+"/format/"+this.editform.projectId,this.$qs.stringify(postData),{
+                        validateStatus: function () {
+                            return true
+                        },
+                        headers: {'Authorization': this.$cookie.get("token")},
+                    })
+                        .then(response=>{
+                            if(response.status==200){
+                                this.getFormats();
+                                this.$message({
+                                    message: response.data.rel,
+                                    type: 'success'
+                                });
+                                this.editDialogFormVisible=false
+                            }
+                            else
+                                this.$message({
+                                    message: response.data.msg,
+                                    type: 'error'
+                                });
+                        })
+                }
+            },
             idExist: function (id) {
                 for (var i in this.formats) {
                     if (i.Name == id)
@@ -186,7 +275,7 @@
                     validateStatus: function () {
                         return true
                     },
-                    headers: {'Authorization': cookies.get("token")},
+                    headers: {'Authorization': this.$cookie.get("token")},
                 })
                     .then(response => {
                         if (response.status == 200) {
@@ -213,11 +302,37 @@
     .block{
         padding-bottom: 30px;
     }
+    .item label{
+        font-weight: bold;
+        width: 70px;
+        display: inline-block;
+        text-align: right;
+    }
     .item.divider{
         border-top: 1px solid #eee;
+        padding-top: 10px;
     }
 
     .item{
         margin:10px 0;
+    }
+    .item span{
+        margin-left: 5px;
+        display: inline-block;
+        width: calc(100% - 80px);
+        vertical-align: top;
+    }
+    .card-footer{
+        text-align: right;
+        border-top: 1px solid #eee;
+        padding: 15px 0 0 0;
+        margin-bottom: -5px;
+    }
+    .footer-btn{
+        padding: 9px 12px;
+        margin-left: 5px;
+    }
+    .dialog{
+        max-width: 350px;
     }
 </style>

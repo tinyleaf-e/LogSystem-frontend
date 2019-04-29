@@ -3,7 +3,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import Layout from './components/Layout.vue'
 import router from  './router'
-import './config.js'
+import config from './config.js'
 import axios from 'axios'
 import qs from 'qs'
 

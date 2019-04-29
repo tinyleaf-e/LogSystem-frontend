@@ -40,7 +40,7 @@ module.exports = (options = {}) => ({
       }
     ]
   },
-  plugins: [
+    plugins: [
     new webpack.optimize.CommonsChunkPlugin({
       names: ['vendor', 'manifest']
     }),

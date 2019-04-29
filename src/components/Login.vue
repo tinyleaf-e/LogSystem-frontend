@@ -20,8 +20,6 @@
 </template>
 
 <script>
-    import axios from "axios";
-    import cookies from "js-cookie"
     export default {
         name: "Login",
         data:function(){
@@ -32,7 +30,7 @@
         },
         methods:{
             login:function () {
-                axios.get(config.serverUrl+"/token",{
+                this.$ajax.get(config.serverUrl+"/token",{
                     params:{
                         id:this.userId,
                         passwd:this.passwd
@@ -43,8 +41,9 @@
                 })
                     .then(response => {
                         if(response.status==200){
-                            cookies.set("token",response.data.data);
-                            cookies.set("id",this.userId);
+                            this.$cookie.set("token",response.data.data);
+                            this.$cookie.set("id",this.userId);
+                            this.$emit('initUserInfo',this.userId,'null');
                             this.$router.push({path:"/projects"})
                         }
                         else

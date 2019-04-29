@@ -4,10 +4,10 @@
             <el-row>
                 <el-col :span="24" style="padding: 20px 0;background: rgba(255,255,255,0)">
                     <el-breadcrumb separator-class="el-icon-arrow-right">
-                        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-                        <el-breadcrumb-item>活动管理</el-breadcrumb-item>
-                        <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-                        <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+                        <el-breadcrumb-item :to="{ path: '/projects' }">首页</el-breadcrumb-item>
+                        <el-breadcrumb-item :to="{path: this.nav.projectUrl}">{{this.nav.projectName}}</el-breadcrumb-item>
+                        <el-breadcrumb-item :to="{path: this.nav.formatUrl}">{{this.nav.formatName}}</el-breadcrumb-item>
+                        <el-breadcrumb-item>{{'Log'}}</el-breadcrumb-item>
                     </el-breadcrumb>
                 </el-col>
             </el-row>
@@ -24,7 +24,7 @@
                     <el-select v-model="queryItem.key" placeholder="请选择" style="width: 200px;margin-left: 30px">
                         <el-option
                                 v-for="(value,key,idx) in keySet"
-                                :key="value"
+                                :key="key"
                                 :label="key"
                                 :value="key">
                         </el-option>
@@ -47,10 +47,10 @@
                             end-placeholder="结束日期"
                             align="right">
                     </el-date-picker>
-                    <el-button type="danger" v-if="idx!=0" size="mini" icon="el-icon-minus" @click="deleteQueryItem(idx)" circle></el-button>
+                    <el-button type="danger" v-if="idx!=0" size="mini" style="margin-left: 8px" icon="el-icon-minus" @click="deleteQueryItem(idx)" circle></el-button>
                 </div>
 
-                <el-button type="primary" icon="el-icon-plus" @click="doQuery()" size="small" style="margin: 15px 60px 20px 0;float: right">搜索</el-button>
+                <el-button type="primary" icon="el-icon-search" :loading="searchBtnLoading" @click="doQuery()" size="small" style="margin: 15px 60px 20px 0;float: right">搜索</el-button>
             </el-row>
             <el-row>
                 <div id="chartHolder"  style="height: 00px"></div>
@@ -160,8 +160,15 @@
                 logSet:[],
                 currentRow:null,
                 formatId:this.$route.query.formatId,
+                nav: {
+                    projectUrl:'',
+                    projectName:'',
+                    formatUrl:'',
+                    formatName:''
+                },
                 keySet:{},
-                logSummaryAttr:{}
+                logSummaryAttr:{},
+                searchBtnLoading:false
             };
         },
         created(){
@@ -170,6 +177,7 @@
         mounted(){
             //this.initChart();
             this.completeKeySet();
+            this.initNav();
             this.doQuery();
         },
         methods:{
@@ -205,6 +213,36 @@
                         arr[key]=false;
                 }
                 this.logSummaryAttr= arr;
+            },
+            initNav:function(){
+                this.$ajax.get(config.serverUrl+"/format/"+this.formatId, {
+                    validateStatus: function () {
+                        return true
+                    },
+                    headers: {'Authorization': this.$cookie.get("token")},
+                })
+                    .then(response=>{
+                        if(response.status==200){
+                            if(response.data.link.project.status=="ok"){
+                                this.nav={
+                                    projectUrl:'/formats?projectId='+response.data.link.project.id,
+                                    projectName:response.data.link.project.name,
+                                    formatUrl:'/format-items?formatId='+response.data.rel.Id,
+                                    formatName:response.data.rel.Name
+                                }
+                            }
+                            else
+                                this.$message({
+                                    message: '导航栏信息获取失败'+response.data.msg,
+                                    type: 'error'
+                                });
+                        }
+                        else
+                            this.$message({
+                                message: response.data.msg,
+                                type: 'error'
+                            });
+                    })
             },
             completeKeySet(){
                 this.$ajax.get(config.serverUrl+"/format-item", {
@@ -270,7 +308,7 @@
                 return query
             },
             doQuery(){
-                console.log(JSON.stringify(this.parseQuery()))
+                this.searchBtnLoading=true;
                 var postData={
                     formatId:this.formatId,
                     query:this.parseQuery()
@@ -282,6 +320,7 @@
                     headers: {'Authorization': this.$cookie.get("token")},
                 })
                     .then(response=>{
+                        this.searchBtnLoading=false;
                         if(response.status==200){
                             if(response.data.rel.length>0)
                                 this.initLogSummaryAttr(response.data.rel[0]);
@@ -322,9 +361,10 @@
 <style scoped>
     .query-item{
         padding: 8px 20px;
+        margin-left: calc(50% - 430px);
     }
     .and-span{
-        width: 32px;
+        width: 28px;
         display: inline-block;
     }
     .attr-item{
@@ -334,6 +374,7 @@
         margin: 8px 0;
         border: 1px solid #eee;
         padding: 10px;
+        min-height: 85px;
     }
 
 </style>
