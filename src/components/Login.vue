@@ -28,6 +28,9 @@
                 passwd:""
             }
         },
+        created:function (){
+            this.$emit('hideUserInfo');
+        },
         methods:{
             login:function () {
                 this.$ajax.get(config.serverUrl+"/token",{
@@ -43,7 +46,7 @@
                         if(response.status==200){
                             this.$cookie.set("token",response.data.data);
                             this.$cookie.set("id",this.userId);
-                            this.$emit('initUserInfo',this.userId,'null');
+                            this.$emit('initUserInfo');
                             this.$router.push({path:"/projects"})
                         }
                         else

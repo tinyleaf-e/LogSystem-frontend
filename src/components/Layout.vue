@@ -20,7 +20,7 @@
             </el-row>
         </el-header>
         <el-main  style="max-width: 1200px;width: 100%;margin: 0 auto;overflow: hidden;padding: 0">
-                <router-view v-on:initUserInfo="initUserInfo"></router-view>
+                <router-view v-on:initUserInfo="initUserInfo" v-on:hideUserInfo="hideUserInfo"></router-view>
 
         </el-main>
         <el-dialog title="修改密码" :visible.sync="editPasswdDialogFormVisible">
@@ -59,9 +59,9 @@
         name: "Layout",
         data:function(){
             return {
-                userId:'',
+                userId:this.$cookie.get("id"),
                 email:'',
-                infoVisible:false,
+                infoVisible:true,
                 editEmailDialogFormVisible:false,
                 editPasswdDialogFormVisible:false,
                 editPasswdForm:{
@@ -82,7 +82,7 @@
                         this.$cookie.remove("token");
                         this.$cookie.remove("id");
                         this.infoVisible=false;
-                        this.$router.push({path: '/login'})
+                        this.$router.push({path: '/login'});
                         break;
                     case 'showEmailDialog':
                         this.editEmailDialogFormVisible=true;
@@ -98,10 +98,12 @@
             editPasswdDialogConfirm:function () {
 
             },
-            initUserInfo:function (userId,email) {
-                this.userId=userId;
-                this.email=email;
+            initUserInfo:function () {
+                this.userId=this.$cookie.get("id");
                 this.infoVisible=true;
+            },
+            hideUserInfo:function () {
+                this.infoVisible=false;
             }
         }
     }
