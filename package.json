@@ -7,7 +7,7 @@
     "build": "rimraf dist && webpack -p --progress --hide-modules"
   },
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "dateformat": "^3.0.3",
     "echarts": "^4.2.1",
     "element-ui": "^2.3.4",
