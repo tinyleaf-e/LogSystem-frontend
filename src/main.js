@@ -6,6 +6,7 @@ import router from  './router'
 import config from './config.js'
 import axios from 'axios'
 import qs from 'qs'
+import "./assets/override-element-ui.css"
 
 import cookies from "js-cookie"
 import dateformat from 'dateformat'

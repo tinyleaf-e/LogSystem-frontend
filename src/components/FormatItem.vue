@@ -268,7 +268,7 @@
                         validateStatus: function () {
                             return true
                         },
-                        headers: {'Authorization': cookies.get("token")},
+                        headers: {'Authorization': this.$cookie.get("token")},
                     })
                         .then(response=>{
                             if(response.status==200){
@@ -291,7 +291,7 @@
             typeCount:function (type) {
                 var count = 0;
                 for(var i in this.formatItems){
-                    if(i.Type==type)
+                    if(i.Type.substring(0,i.Type.length-1)==type)
                         count++
                 }
                 return count
@@ -308,7 +308,7 @@
                     validateStatus: function () {
                         return true
                     },
-                    headers: {'Authorization': this.cookie.get("token")},
+                    headers: {'Authorization': this.$cookie.get("token")},
                 })
                     .then(response=>{
                         if(response.status==200){

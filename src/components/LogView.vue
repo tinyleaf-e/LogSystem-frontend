@@ -3,7 +3,7 @@
         <el-header style="height: auto;">
             <el-row>
                 <el-col :span="24" style="padding: 20px 0;background: rgba(255,255,255,0)">
-                    <el-breadcrumb separator-class="el-icon-arrow-right">
+                    <el-breadcrumb class="nav" separator-class="el-icon-arrow-right">
                         <el-breadcrumb-item :to="{ path: '/projects' }">首页</el-breadcrumb-item>
                         <el-breadcrumb-item :to="{path: this.nav.projectUrl}">{{this.nav.projectName}}</el-breadcrumb-item>
                         <el-breadcrumb-item :to="{path: this.nav.formatUrl}">{{this.nav.formatName}}</el-breadcrumb-item>
@@ -50,7 +50,7 @@
                     <el-button type="danger" v-if="idx!=0" size="mini" style="margin-left: 8px" icon="el-icon-minus" @click="deleteQueryItem(idx)" circle></el-button>
                 </div>
 
-                <el-button type="primary" icon="el-icon-search" :loading="searchBtnLoading" @click="doQuery()" size="small" style="margin: 15px 60px 20px 0;float: right">搜索</el-button>
+                <el-button type="primary" icon="el-icon-search" :loading="searchBtnLoading" @click="currentPage=1;doQuery()" size="small" style="margin: 15px 60px 20px 0;float: right">搜索</el-button>
             </el-row>
             <el-row>
                 <div id="chartHolder"  style="height: 00px"></div>
@@ -58,7 +58,7 @@
             <el-row>
                 <el-container>
                     <el-aside style="padding-top: 40px;width: 400px;padding-left: 15px">
-                        <label style="height: 40px;display: inline-block">共检索到 <span>{{logSet.length}}</span> 条日志</label>
+                        <label style="height: 40px;display: inline-block">共检索到 <span>{{logCount}}</span> 条日志</label>
 
                         <el-popover
                                 ref="popover4"
@@ -74,6 +74,7 @@
                         <div class="log-summary">
                             <el-table :data="logSet"
                                     highlight-current-row
+                                      ref="logTable"
                                     @current-change="handleCurrentChange"
                                     style="width: 100%">
                                 <el-table-column label="日志">
@@ -86,11 +87,13 @@
                                 </el-table-column>
                             </el-table>
                         </div>
+                        <el-pagination v-if="this.logCount>0" style="margin-top: 10px" @current-change="handleCurrentPageChange" :small="true" :total="logCount" :page-size="10" layout="prev, pager, next, jumper">
+                        </el-pagination>
 
                     </el-aside>
                     <el-main style="padding-left: 30px;border-left: 1px dashed #eee;margin-left: 30px">
                         <h5>日志详情</h5>
-                        <el-form class="log-detail-form" label-position="right" label-width="100px">
+                        <el-form class="log-detail-form" label-position="right" :label-width="labelWidth">
                             <el-form-item v-for="(value, attr,idx) in currentRow" :key="idx" :label="attr" style="font-weight: bold;font-size: 18px;margin-bottom: 0">
                                 <span style="display: inline-block;margin-left: -8px;vertical-align: top">：</span>
                                 <span style="font-weight: normal;font-size: 14px;display: inline-block;width: calc(100% - 20px);">{{parseIfTime(attr,value)}}</span>
@@ -131,6 +134,30 @@
                 ],
                 pickerOptions2: {
                     shortcuts: [{
+                        text: '最近一小时',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 1);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    },{
+                        text: '最近一天',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    },{
+                        text: '最近三天',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 3);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    },{
                         text: '最近一周',
                         onClick(picker) {
                             const end = new Date();
@@ -168,7 +195,10 @@
                 },
                 keySet:{},
                 logSummaryAttr:{},
-                searchBtnLoading:false
+                searchBtnLoading:false,
+                logCount:0,
+                currentPage:1,
+                labelWidth:'80px'
             };
         },
         created(){
@@ -311,7 +341,9 @@
                 this.searchBtnLoading=true;
                 var postData={
                     formatId:this.formatId,
-                    query:this.parseQuery()
+                    query:this.parseQuery(),
+                    page:this.currentPage,
+                    pageSize:10
                 };
                 this.$ajax.post(config.serverUrl+"/queryLog",postData,{
                     validateStatus: function () {
@@ -322,9 +354,17 @@
                     .then(response=>{
                         this.searchBtnLoading=false;
                         if(response.status==200){
-                            if(response.data.rel.length>0)
-                                this.initLogSummaryAttr(response.data.rel[0]);
                             this.logSet=response.data.rel;
+                            if(response.data.rel.length>0)
+                            {
+                                this.logCount=response.data.count;
+                                this.initLabelWidth(response.data.rel[0]);
+                                this.initLogSummaryAttr(response.data.rel[0]);
+                                this.$refs.logTable.setCurrentRow(this.logSet[0])
+                                this.currentRow=this.logSet[0]
+                            }else{
+                                this.logCount=0;
+                            }
                         }
                         else
                             this.$message({
@@ -332,6 +372,10 @@
                                 type: 'error'
                             });
                     })
+            },
+            handleCurrentPageChange(val){
+                this.currentPage=val;
+                this.doQuery()
             },
             handleCurrentChange(val) {
                 this.currentRow = val;
@@ -353,8 +397,19 @@
                     return this.$dateformat(val,'yyyy-mm-dd HH:MM:ss')
                 else
                     return val
+            },
+            getStrLength(str) {
+                return str.replace(/[\u0391-\uFFE5]/g,"aa").length;  //先把中文替换成两个字节的英文，在计算长度
+            },
+            initLabelWidth(row){
+                var max=0;
+                for(var i in row){
+                    if(this.getStrLength(i)>max)
+                        max=this.getStrLength(i)
+                }
+                this.labelWidth=(max*8)+"px";
             }
-        }
+    }
     }
 </script>
 
@@ -376,5 +431,7 @@
         padding: 10px;
         min-height: 85px;
     }
-
+    .nav span{
+        font-weight: normal!important;
+    }
 </style>

@@ -1,0 +1,9 @@
+.el-breadcrumb__inner a, .el-breadcrumb__inner.is-link {
+    font-weight: normal;
+    text-decoration: none;
+    transition: color .2s cubic-bezier(.645,.045,.355,1);
+    color: #303133;
+}
+.el-form-item__label{
+    white-space: nowrap;
+}
